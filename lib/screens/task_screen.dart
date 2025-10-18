@@ -15,6 +15,8 @@ class _TaskScreenState extends State<TaskScreen> {
     Task(name: 'Build a Flutter App', completed: false),
   ];
 
+  TextEditingController taskNameController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,14 +30,73 @@ class _TaskScreenState extends State<TaskScreen> {
           Task task = tasks[index];
 
           return ListTile(
-            leading: Checkbox(value: task.completed, onChanged: (value) {}),
+            leading: Checkbox(
+              value: task.completed,
+              onChanged: (value) {
+                Task updatedTask = Task(
+                  name: task.name,
+                  completed: value ?? false,
+                );
+
+                setState(() {
+                  tasks[index] = updatedTask;
+                });
+              },
+            ),
             title: Text(task.name),
-            trailing: IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+            trailing: IconButton(
+              onPressed: () {
+                setState(() {
+                  tasks.removeAt(index);
+                });
+              },
+              icon: Icon(Icons.delete),
+            ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Add a new task'),
+                content: TextField(controller: taskNameController),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      taskNameController.clear();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      String taskName = taskNameController.text.trim();
+
+                      if (taskName.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Please enter a task name')),
+                        );
+                        return;
+                      }
+
+                      Task task = Task(name: taskName, completed: false);
+                      setState(() {
+                        tasks.add(task);
+                      });
+
+                      taskNameController.clear();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Save'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
         child: Icon(Icons.add),
       ),
     );
