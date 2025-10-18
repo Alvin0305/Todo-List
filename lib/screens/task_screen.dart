@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/models/task.dart';
+import 'package:todolist/services/database_service.dart';
 
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});
@@ -9,11 +10,7 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  List<Task> tasks = [
-    Task(name: 'Setup Android Studio', completed: true),
-    Task(name: 'Learn Flutter', completed: true),
-    Task(name: 'Build a Flutter App', completed: false),
-  ];
+  List<Task> tasks = getTasks();
 
   TextEditingController taskNameController = TextEditingController();
 
@@ -38,6 +35,7 @@ class _TaskScreenState extends State<TaskScreen> {
                   completed: value ?? false,
                 );
 
+                updateTask(index, updatedTask);
                 setState(() {
                   tasks[index] = updatedTask;
                 });
@@ -46,6 +44,7 @@ class _TaskScreenState extends State<TaskScreen> {
             title: Text(task.name),
             trailing: IconButton(
               onPressed: () {
+                deleteTask(index);
                 setState(() {
                   tasks.removeAt(index);
                 });
@@ -83,6 +82,7 @@ class _TaskScreenState extends State<TaskScreen> {
                       }
 
                       Task task = Task(name: taskName, completed: false);
+                      addTask(task);
                       setState(() {
                         tasks.add(task);
                       });
